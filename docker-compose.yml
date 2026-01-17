@@ -1,0 +1,67 @@
+services:
+
+  pessoas-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pessoas-api
+    ports:
+      - "8084:8084"
+    depends_on:
+      mongodb:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+      mailhog:
+        condition: service_started
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/pessoasdb
+
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+
+      SPRING_MAIL_HOST: mailhog
+      SPRING_MAIL_PORT: 1025
+      SPRING_MAIL_USERNAME: ""
+      SPRING_MAIL_PASSWORD: ""
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: "false"
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: "false"
+    networks:
+      - pessoas-network
+
+  mongodb:
+    image: mongo:7
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - pessoas-network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - pessoas-network
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: mailhog
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # Interface Web
+    networks:
+      - pessoas-network
+
+networks:
+  pessoas-network:
+    driver: bridge
+
+volumes:
+  mongo-data:

@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: pessoas-api
+
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: /
+
+  mongodb:
+    uri: mongodb://mongodb:27017/pessoasdb
+
+mail:
+  enabled: true
+
+server:
+  port: 8084
+
